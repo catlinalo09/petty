@@ -1,0 +1,7 @@
+azul claro : #C9E6FFE0
+azul oscuro : #728FA8E0
+
+claro : #FFC9E6E0
+oscuro : #D996B9E0
+#F9EBC2
+#CBE9F0
