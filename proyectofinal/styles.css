@@ -507,3 +507,15 @@ body {
     background: #fff;
     text-align: center;
 }
+
+.footer .share{
+    padding: 1rem 0;
+}
+
+.footer .share a{
+    height: 5rem;
+    width: 5rem;
+    line-height: 5rem;
+    font-size: 2rem;
+    color: var(--main-color);
+}
