@@ -4,7 +4,7 @@
     --main-color: #fcb0c7;
     --black: #13131a;
     --bg: #fdfdfde0;
-    --border: .1rem solid rgba(255, 255, 255, .3);
+    --border: .1rem solid rgba(206, 169, 152, 0.918);
 }
 
 *{
@@ -307,13 +307,13 @@ body{
 
 
 .menu .box-container .box h3 {
-    color: #b18a70;
+    color: var(--main-color);
     font-size: 2rem;
     padding: 1rem 0;
 }
 
 .menu .box-container .box .price {
-    color: #b18a70;
+    color: var(--main-color);
     font-size: 2.5rem;
     padding: .5rem 0;
 }
@@ -400,4 +400,110 @@ body{
     html{
         font-size: 50%;
     }
+}
+
+
+
+body {
+    background-color: var(--bg);
+    color: #fff;
+    font-family: 'Poppins', sans-serif;
+}
+
+.menu .box-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(30rem, 1fr));
+    gap: 1.5rem;
+}
+
+.products .box-container .box {
+    text-align: center;
+    border: var(--border);
+    padding: 2rem;
+    background-color: #fff;
+}
+
+
+.products .box-container .box .icons a {
+    height: 4.5rem;
+    width: 4.5rem;
+    line-height: 4.5rem;
+    font-size: 1.7rem;
+    border: var(--border);
+    color: var(--main-color);
+    margin: .3rem;
+    display: inline-block;
+    text-decoration: none;
+    transition: .2s linear;
+}
+
+.products .box-container .box .icons a:hover {
+    background: #fcb0c7;
+}
+
+
+.products .box-container .box .image {
+    padding: 2rem 0;
+}
+
+.products .box-container .box .image img {
+    height: 25rem;
+    object-fit: contain;
+}
+
+.products .box-container .box .content h3 {
+    color: #b18a70;
+    font-size: 2.2rem;
+}
+
+.products .box-container .box .content .stars {
+    padding: 1rem 0;
+}
+
+.products .box-container .box .content .stars i {
+    font-size: 1.7rem;
+    color: var(--main-color);
+}
+
+.products .box-container .box .content .price {
+    color: #b18a70;
+    font-size: 2.5rem;
+}
+
+.products .box-container .box .content .price span {
+    text-decoration: line-through;
+    font-size: 1.5rem;
+    font-weight: light;
+    color: #ccc;
+}
+
+
+
+.contact form .inputBox {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.contact form .inputBox i {
+    position: absolute;
+    top: 50%;
+    left: 1.5rem;
+    transform: translateY(-50%);
+    font-size: 1.6rem;
+    color: var(--main-color);
+}
+
+.contact form .inputBox input {
+    width: 100%;
+    padding: 1rem 1rem 1rem 4rem;
+    font-size: 1.6rem;
+    color: #333;
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: .5rem;
+}
+
+.footer {
+    background: #fff;
+    text-align: center;
 }
