@@ -1,4 +1,4 @@
-# Petty · Full Stack (React + Express + MongoDB)
+﻿# Petty · Full Stack (React + Express + MongoDB)
 
 Sitio de Petty (delicias artesanales para mascotas) migrado de HTML/CSS/JS estático a una
 aplicación full stack:
@@ -8,14 +8,16 @@ aplicación full stack:
 - **Base de datos:** MongoDB + Mongoose
 - **Carrito** con `localStorage`, búsqueda de productos y formulario de contacto conectado a la API.
 
+**Sitio publicado:** <https://petty-catalina.netlify.app>
+
 ---
 
 ## Estructura del proyecto
 
 ```
 proyectofinal/
-├── client/                    # Frontend React (Vite)
-│   ├── public/images/         # Imágenes (copia de /images)
+├── frontend/                  # Frontend React (Vite)
+│   ├── public/images/         # Imágenes del sitio
 │   ├── src/
 │   │   ├── components/        # Header, Home, About, Menu, Products, Contact, Footer
 │   │   ├── context/           # Carrito (React Context + localStorage)
@@ -24,10 +26,10 @@ proyectofinal/
 │   │   ├── api.js             # Cliente HTTP (fetch)
 │   │   ├── App.jsx
 │   │   ├── main.jsx
-│   │   └── styles.css         # Estilos originales + ajustes
+│   │   └── styles.css         # Estilos del sitio
 │   ├── index.html
 │   └── vite.config.js         # Proxy /api -> http://localhost:4000
-├── server/                    # Backend Express
+├── backend/                   # Backend Express
 │   ├── src/
 │   │   ├── config/            # Carga de .env y conexión a MongoDB
 │   │   ├── controllers/       # Lógica de productos y mensajes
@@ -38,13 +40,11 @@ proyectofinal/
 │   │   ├── index.js           # Arranque + reintento de conexión
 │   │   └── seed.js            # Datos iniciales
 │   └── .env                   # Variables locales (no se sube a git)
-├── images/                    # Imágenes originales (se conservan)
-├── index.html / styles.css / script.js   # Versión estática anterior (referencia)
-└── package.json               # Workspaces + scripts raíz
+├── netlify/functions/api.mjs  # La API como función de Netlify
+├── netlify.toml               # Build, redirects y funciones
+├── package.json               # Workspaces + scripts raíz
+└── README.md
 ```
-
-> Los archivos estáticos de la raíz (`index.html`, `styles.css`, `script.js`) se dejaron intactos
-> como referencia. Cuando confirmes que la versión React funciona, puedes eliminarlos.
 
 ---
 
@@ -78,7 +78,7 @@ npm install
 
 ## 3. Configurar MongoDB
 
-Edita **`server/.env`**:
+Edita **`backend/.env`**:
 
 ### Opción A · MongoDB local
 
@@ -107,7 +107,7 @@ Si no lo tienes instalado, descárgalo desde
    - Rol: **Read and write to any database**.
 4. En **Network Access** → **Add IP Address**:
    - **Add Current IP Address** para tu equipo, o
-   - `0.0.0.0/0` para permitir cualquier IP (solo para pruebas/demos).
+   - `0.0.0.0/0` para permitir cualquier IP (necesario si la API corre en Netlify, Render, etc.).
 5. En el cluster, clic en **Connect** → **Drivers** → **Node.js**.
    Copia la cadena, que se ve así:
 
@@ -115,7 +115,7 @@ Si no lo tienes instalado, descárgalo desde
    mongodb+srv://USUARIO:PASSWORD@cluster0.xxxxx.mongodb.net/?retryWrites=true&w=majority
    ```
 
-6. Pega la cadena en `server/.env`, reemplazando usuario y contraseña, y agrega el
+6. Pega la cadena en `backend/.env`, reemplazando usuario y contraseña, y agrega el
    nombre de la base de datos (`petty`) antes del `?`:
 
    ```env
@@ -139,8 +139,6 @@ Si no lo tienes instalado, descárgalo desde
 > codificados en la URL (por ejemplo `@` → `%40`, `#` → `%23`).
 >
 > Atlas empieza con la base de datos vacía: por eso hay que ejecutar `npm run seed`.
-> Si más adelante despliegas el backend (Render/Railway), agrega esa misma
-> `MONGODB_URI` como variable de entorno del servicio.
 
 ### Variables disponibles
 
@@ -241,38 +239,67 @@ Invoke-RestMethod -Method Post -Uri http://localhost:4000/api/messages `
 
 ---
 
-## 7. Producción
+## 7. Producción local
 
 ```bash
-npm run build          # genera client/dist
+npm run build          # genera frontend/dist
 npm run start:prod     # NODE_ENV=production + Express sirve el build de React
 ```
 
-La app completa queda en <http://localhost:4000>. Express sirve `client/dist` y mantiene la API
+La app completa queda en <http://localhost:4000>. Express sirve `frontend/dist` y mantiene la API
 en `/api`.
 
-Para cambiar los orígenes permitidos en producción, ajusta `CLIENT_ORIGIN` en `server/.env`.
+Para cambiar los orígenes permitidos en producción, ajusta `CLIENT_ORIGIN` en `backend/.env`.
 Las peticiones del **mismo origen** (el navegador usando el mismo dominio que la API) siempre se
 aceptan, así que también funciona detrás de un túnel o dominio propio sin tocar esa variable.
 
 ---
 
-## 8. Problemas comunes
+## 8. Despliegue en Netlify
 
-| Síntoma                                             | Solución                                                                 |
-| --------------------------------------------------- | ------------------------------------------------------------------------ |
-| `MongoDB no disponible` en la consola               | Inicia MongoDB local o revisa `MONGODB_URI` en `server/.env`.            |
-| `503` en `/api/products`                            | La API está corriendo pero sin base de datos; revisa el paso 3.          |
-| El frontend muestra el catálogo local               | La API no respondió; revisa la consola del servidor y pulsa "reintentar". |
-| `npm.ps1 no se puede cargar`                        | Usa `npm.cmd` o habilita la política de ejecución solo para la sesión.   |
-| Cambios en `server/.env` no se aplican              | Reinicia `npm run dev` (dotenv se lee al arrancar).                      |
-| El carrito no se guarda                             | Revisa que el navegador permita `localStorage` (modo normal, no incógnito). |
+El sitio está publicado en **<https://petty-catalina.netlify.app>** con esta arquitectura:
+
+| Parte | Dónde vive |
+| --- | --- |
+| React (build de Vite) | Archivos estáticos de Netlify |
+| API de Express | Función `netlify/functions/api.mjs` |
+| Base de datos | MongoDB Atlas |
+
+- `netlify.toml` redirige `/api/*` a la función y deja el resto a React (SPA).
+- La función usa `serverless-http` para reutilizar la misma app de Express.
+- Las variables `MONGODB_URI` y `ADMIN_TOKEN` se configuran en
+  **Site configuration → Environment variables** de Netlify (nunca en el código).
+
+Para volver a desplegar después de un cambio:
+
+```bash
+npm run build
+npx netlify-cli deploy --prod --site 41401900-c35c-44ef-97ec-7cf24c6a7e2a \
+  --dir frontend/dist --functions netlify/functions
+```
+
+> Los cambios en variables de entorno requieren un nuevo deploy para aplicarse.
 
 ---
 
-## 9. Siguientes pasos sugeridos
+## 9. Problemas comunes
+
+| Síntoma                                             | Solución                                                                 |
+| --------------------------------------------------- | ------------------------------------------------------------------------ |
+| `MongoDB no disponible` en la consola               | Inicia MongoDB local o revisa `MONGODB_URI` en `backend/.env`.            |
+| `503` en `/api/products`                            | La API está corriendo pero sin base de datos; revisa el paso 3.          |
+| El frontend muestra el catálogo local               | La API no respondió; revisa la consola del servidor y pulsa "reintentar". |
+| `npm.ps1 no se puede cargar`                        | Usa `npm.cmd` o habilita la política de ejecución solo para la sesión.   |
+| Cambios en `backend/.env` no se aplican              | Reinicia `npm run dev` (dotenv se lee al arrancar).                      |
+| El carrito no se guarda                             | Revisa que el navegador permita `localStorage` (modo normal, no incógnito). |
+| Netlify responde `401`                              | Desactiva *Visitor access* (SSO) en la configuración del sitio.          |
+| La API en Netlify responde `503`                    | Revisa `MONGODB_URI` y que Atlas permita la IP `0.0.0.0/0`.               |
+
+---
+
+## 10. Siguientes pasos sugeridos
 
 - Autenticación de administrador (JWT) para el panel de productos y mensajes.
 - Panel de administración en React (`/admin`) para CRUD de productos y bandeja de mensajes.
 - Pasarela de pagos para el carrito.
-- Despliegue: frontend en Vercel/Netlify y API en Render/Railway + MongoDB Atlas.
+- Dominio propio (por ejemplo `petty.com`) desde Netlify → *Domain management*.

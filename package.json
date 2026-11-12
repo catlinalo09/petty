@@ -4,21 +4,24 @@
   "private": true,
   "description": "Petty - tienda de delicias para mascotas (React + Express + MongoDB)",
   "workspaces": [
-    "server",
-    "client"
+    "backend",
+    "frontend"
   ],
   "scripts": {
-    "dev": "concurrently -n api,web -c magenta,cyan \"npm:dev:server\" \"npm:dev:client\"",
-    "dev:server": "npm run dev --workspace server",
-    "dev:client": "npm run dev --workspace client",
-    "seed": "npm run seed --workspace server",
-    "build": "npm run build --workspace client",
-    "start": "npm start --workspace server",
-    "start:prod": "cross-env NODE_ENV=production npm start --workspace server"
+    "dev": "concurrently -n api,web -c magenta,cyan \"npm:dev:backend\" \"npm:dev:frontend\"",
+    "dev:backend": "npm run dev --workspace backend",
+    "dev:frontend": "npm run dev --workspace frontend",
+    "seed": "npm run seed --workspace backend",
+    "build": "npm run build --workspace frontend",
+    "start": "npm start --workspace backend",
+    "start:prod": "cross-env NODE_ENV=production npm start --workspace backend"
   },
   "devDependencies": {
     "concurrently": "^9.1.2",
     "cross-env": "^7.0.3"
+  },
+  "dependencies": {
+    "serverless-http": "^3.2.0"
   },
   "engines": {
     "node": ">=20"
