@@ -14,23 +14,37 @@ const app = express();
 
 app.disable('x-powered-by');
 
-app.use(
+app.use((req, res, next) => {
   cors({
     origin(origin, callback) {
+      // Peticiones sin cabecera Origin (curl, Postman, same-origin simple).
+      if (!origin) return callback(null, true);
+
       const allowed = (process.env.CLIENT_ORIGIN || '')
         .split(',')
         .map((value) => value.trim())
         .filter(Boolean);
 
       // Sin lista configurada se permite cualquier origen (desarrollo).
-      if (!origin || allowed.length === 0 || allowed.includes(origin)) {
+      if (allowed.length === 0 || allowed.includes(origin)) {
         return callback(null, true);
+      }
+
+      // Mismo origen: en producción este servidor entrega el build de React,
+      // así que el navegador usa el mismo host que la API. Esto permite túneles
+      // (Cloudflare, localtunnel, etc.) cuyo dominio cambia en cada ejecución.
+      try {
+        if (new URL(origin).host === req.headers.host) {
+          return callback(null, true);
+        }
+      } catch {
+        // Origen mal formado: se rechaza abajo.
       }
 
       return callback(new Error(`Origen no permitido por CORS: ${origin}`));
     },
-  }),
-);
+  })(req, res, next);
+});
 
 app.use(express.json({ limit: '100kb' }));
 

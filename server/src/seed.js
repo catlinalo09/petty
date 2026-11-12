@@ -8,8 +8,8 @@ const products = [
   {
     name: 'Proteína saludable',
     description: 'Snack horneado con proteína natural, ideal como premio diario.',
-    price: 25000,
-    oldPrice: 20000,
+    price: 20000,
+    oldPrice: 25000,
     image: '/images/menu.1.jpg',
     category: 'menu',
     rating: 4.5,
