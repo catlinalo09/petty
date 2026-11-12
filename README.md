@@ -98,16 +98,49 @@ Si no lo tienes instalado, descárgalo desde
 
 ### Opción B · MongoDB Atlas
 
-1. Crea un cluster gratuito en Atlas.
-2. Crea un usuario de base de datos y permite tu IP (o `0.0.0.0/0` solo para pruebas).
-3. Copia la cadena de conexión y reemplaza usuario, contraseña y cluster:
+1. Entra a <https://www.mongodb.com/atlas> y crea una cuenta (puedes usar Google).
+2. Clic en **Create** → elige el plan **M0 Free** → proveedor y región más cercanos
+   (por ejemplo AWS `us-east-1` o `sa-east-1`) → **Create Deployment**.
+3. En **Database Access** → **Add New Database User**:
+   - Método: **Password**.
+   - Usuario y contraseña (guárdalos, los necesitarás en la URI).
+   - Rol: **Read and write to any database**.
+4. En **Network Access** → **Add IP Address**:
+   - **Add Current IP Address** para tu equipo, o
+   - `0.0.0.0/0` para permitir cualquier IP (solo para pruebas/demos).
+5. En el cluster, clic en **Connect** → **Drivers** → **Node.js**.
+   Copia la cadena, que se ve así:
 
-```env
-MONGODB_URI=mongodb+srv://USUARIO:PASSWORD@cluster0.xxxxx.mongodb.net/petty?retryWrites=true&w=majority
-```
+   ```
+   mongodb+srv://USUARIO:PASSWORD@cluster0.xxxxx.mongodb.net/?retryWrites=true&w=majority
+   ```
 
-> Si la contraseña tiene caracteres especiales (`@`, `#`, `/`, etc.) deben ir codificados
-> (por ejemplo `@` → `%40`).
+6. Pega la cadena en `server/.env`, reemplazando usuario y contraseña, y agrega el
+   nombre de la base de datos (`petty`) antes del `?`:
+
+   ```env
+   MONGODB_URI=mongodb+srv://USUARIO:PASSWORD@cluster0.xxxxx.mongodb.net/petty?retryWrites=true&w=majority
+   ```
+
+7. Reinicia la API (`npm run dev`) y carga los datos:
+
+   ```bash
+   npm run seed
+   ```
+
+8. Verifica la conexión:
+
+   ```bash
+   Invoke-RestMethod http://localhost:4000/api/health
+   # debe devolver "db": "connected"
+   ```
+
+> Si la contraseña tiene caracteres especiales (`@`, `#`, `/`, `:`, `?`, etc.) deben ir
+> codificados en la URL (por ejemplo `@` → `%40`, `#` → `%23`).
+>
+> Atlas empieza con la base de datos vacía: por eso hay que ejecutar `npm run seed`.
+> Si más adelante despliegas el backend (Render/Railway), agrega esa misma
+> `MONGODB_URI` como variable de entorno del servicio.
 
 ### Variables disponibles
 
@@ -115,7 +148,7 @@ MONGODB_URI=mongodb+srv://USUARIO:PASSWORD@cluster0.xxxxx.mongodb.net/petty?retr
 | --------------- | -------------------------------------------------------- | -------------------------------------- |
 | `PORT`          | Puerto de la API                                         | `4000`                                 |
 | `MONGODB_URI`   | Cadena de conexión de MongoDB                            | `mongodb://127.0.0.1:27017/petty`      |
-| `CLIENT_ORIGIN` | Orígenes permitidos por CORS (separados por coma)        | `http://localhost:5173`                |
+| `CLIENT_ORIGIN` | Orígenes extra permitidos por CORS (separados por coma)  | `http://localhost:5173`                |
 | `ADMIN_TOKEN`   | Token para POST/PUT/DELETE. Vacío = endpoints abiertos   | vacío                                  |
 
 ---
@@ -218,7 +251,9 @@ npm run start:prod     # NODE_ENV=production + Express sirve el build de React
 La app completa queda en <http://localhost:4000>. Express sirve `client/dist` y mantiene la API
 en `/api`.
 
-Para cambiar el origen permitido en producción, ajusta `CLIENT_ORIGIN` en `server/.env`.
+Para cambiar los orígenes permitidos en producción, ajusta `CLIENT_ORIGIN` en `server/.env`.
+Las peticiones del **mismo origen** (el navegador usando el mismo dominio que la API) siempre se
+aceptan, así que también funciona detrás de un túnel o dominio propio sin tocar esa variable.
 
 ---
 
