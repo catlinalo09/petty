@@ -129,7 +129,7 @@ npm run seed
 ```
 
 Inserta/actualiza los 10 productos del catálogo original (6 servicios + 4 productos).
-Puedes ejecutarlo varias veces: no duplica registros (hace *upsert* por nombre y categoría).
+Puedes ejecutarlo varias veces: no duplica registros (hace *upsert* por imagen).
 
 ---
 
