@@ -106,7 +106,9 @@ async function seed() {
 
   const operations = products.map((product) => ({
     updateOne: {
-      filter: { name: product.name, category: product.category },
+      // La imagen identifica de forma única cada producto del catálogo inicial,
+      // porque hay nombres repetidos (varios "Bowl de proteína").
+      filter: { image: product.image },
       update: { $set: product },
       upsert: true,
     },
